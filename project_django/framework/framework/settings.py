@@ -37,9 +37,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'ais',# Aplikasi ais
-    'django_bootstrap5', # Bootstrap
+    'ais',  # Aplikasi ais
+    'django_bootstrap5',  # Bootstrap
+    'django_seed',  # Seeder
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -77,10 +79,15 @@ WSGI_APPLICATION = 'framework.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'ais',  # Nama database yang telah dibuat di phpMyAdmin
+        'USER': 'root',  # User default MySQL di XAMPP
+        'PASSWORD': '',  # Biasanya password default di XAMPP kosong (tidak diisi)
+        'HOST': '127.0.0.1',  # Host MySQL di XAMPP (localhost)
+        'PORT': '3306',
     }
 }
+
 
 
 # Password validation
