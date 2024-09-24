@@ -58,7 +58,7 @@ ROOT_URLCONF = 'framework.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['templates'],
+        'DIRS': [BASE_DIR / 'templates'],  # Menggunakan BASE_DIR untuk path absolut
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -66,10 +66,23 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.static',  # Untuk akses file statis di template
             ],
         },
     },
 ]
+
+# URL dasar untuk file statis
+STATIC_URL = '/static/'
+
+# Lokasi folder static di proyek selama pengembangan
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
+
+# Lokasi folder untuk menyimpan file statis saat production (hasil collectstatic)
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
 
 WSGI_APPLICATION = 'framework.wsgi.application'
 
