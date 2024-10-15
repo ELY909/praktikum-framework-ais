@@ -1,9 +1,11 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseForbidden
 from django.db.models import Q
 from .forms import StudentsForm
 from .models import Students
+from django.contrib.auth.decorators import login_required
+from .decorators import group_required
 
 def homepage(request):
     return render(request, 'homepage/index.html')
@@ -55,3 +57,30 @@ def student_delete(request, student_id):
     student.delete()
     messages.success(request, 'Data mahasiswa berhasil dihapus')
     return JsonResponse({'success': True})
+
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseForbidden
+from django.shortcuts import redirect, render
+
+@login_required
+def dashboard(request):
+    user = request.user
+    if user.groups.filter(name='Admin').exists():
+        return redirect('dashboard_admin')
+    elif user.groups.filter(name='Student').exists():
+        return redirect('dashboard_student')
+    elif user.groups.filter(name='Teacher').exists():
+        return redirect('dashboard_teacher')
+    return HttpResponseForbidden("You do not have permission to access this page.")
+
+@group_required('Admin')
+def dashboard_admin(request):
+    return render(request, 'dashboard/admin.html')
+
+@group_required('Student')
+def dashboard_student(request):
+    return render(request, 'dashboard/student.html')
+
+@group_required('Teacher')
+def dashboard_teacher(request):
+    return render(request, 'dashboard/teacher.html')
