@@ -10,10 +10,9 @@ Daftar Mahasiswa
     <a href="{% url 'student_create' %}" class="btn btn-primary mb-3">Tambah Mahasiswa</a>
 
     <form method="GET" action="{% url 'student_index' %}" class="d-flex mb-3">
-    <input class="form-control me-2" type="search" name="q" placeholder="Cari mahasiswa..." value="{{ query|default:'' }}" aria-label="Search">
-    <button class="btn btn-outline-success" type="submit">Cari</button>
-</form>
-
+        <input class="form-control me-2" type="search" name="q" placeholder="Cari mahasiswa..." value="{{ query|default:'' }}" aria-label="Search">
+        <button class="btn btn-outline-success" type="submit">Cari</button>
+    </form>
 
     <table class="table">
         <thead>
@@ -59,32 +58,43 @@ Daftar Mahasiswa
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
-            confirmButtonText: 'Ya, Hapus!'
+            confirmButtonText: 'Ya, Hapus!',
+            cancelButtonText: 'Batal'
         }).then((result) => {
             if (result.isConfirmed) {
-                // Ini AJAX
-                fetch(`/student/delete/${studentId}`, {
+                // Tambahkan trailing slash pada URL
+                fetch(`/student/delete/${studentId}/`, {
                     method: 'POST',
                     headers: {
-                        'X-CSRFToken': '{{ csrf_token }}'
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'Content-Type': 'application/json'
                     }
-                }).then(response => {
-                    if (response.ok) {
-                        Swal.fire(
-                            'Deleted!',
-                            'Student has been deleted.',
-                            'success'
-                        ).then(() => {
-                            // Reload the page after success
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            title: 'Berhasil!',
+                            text: 'Data mahasiswa telah dihapus.',
+                            icon: 'success'
+                        }).then(() => {
                             window.location.reload();
                         });
                     } else {
-                        Swal.fire(
-                            'Error!',
-                            'There was an issue deleting the student.',
-                            'error'
-                        );
+                        throw new Error(data.error || 'Gagal menghapus data');
                     }
+                })
+                .catch(error => {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: `Gagal menghapus data: ${error.message}`,
+                        icon: 'error'
+                    });
                 });
             }
         });
